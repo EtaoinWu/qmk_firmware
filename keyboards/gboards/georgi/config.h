@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* Defaults */
 
-#define VERSION "v1.1: ClayM"
+#define VERSION "v1.1.1: ClayM/etaoin"
 #define VERBOSE
 
 #define NO_ACTION_ONESHOT

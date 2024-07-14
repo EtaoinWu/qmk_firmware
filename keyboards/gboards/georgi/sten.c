@@ -19,7 +19,7 @@ char debugMsg[32];
 uint32_t releasedChord	= 0;		// Keys released from current chord
 uint32_t tChord			= 0;		// Protects state of cChord
 
-#ifndef STENOLAYERS
+#ifndef STENO_LAYERS
 uint32_t stenoLayers[] = { PWR };
 size_t 	 stenoLayerCount = ARRAY_SIZE(stenoLayers);
 #endif
@@ -389,6 +389,27 @@ void SEND(uint8_t kc) {
 	} 
 
 	if (cMode != COMMAND) register_code(kc);
+	return;
+}
+void SEND16(uint16_t kc) {
+	// Send Keycode, Implements Modifiers
+	if (IS_QK_BASIC(kc)) {
+		return SEND((uint8_t)(kc));
+	}
+	if (IS_QK_MODS(kc)) {
+		if (kc & QK_RMODS_MIN) {
+			if (kc & QK_LCTL) SEND(KC_RCTL);
+			if (kc & QK_LSFT) SEND(KC_RSFT);
+			if (kc & QK_LALT) SEND(KC_RALT);
+			if (kc & QK_LGUI) SEND(KC_RGUI);
+		} else {
+			if (kc & QK_LCTL) SEND(KC_LCTL);
+			if (kc & QK_LSFT) SEND(KC_LSFT);
+			if (kc & QK_LALT) SEND(KC_LALT);
+			if (kc & QK_LGUI) SEND(KC_LGUI);
+		}
+		return SEND((uint8_t)(kc & QK_BASIC_MAX));
+	}
 	return;
 }
 void REPEAT(void) {
