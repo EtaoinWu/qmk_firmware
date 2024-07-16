@@ -1,7 +1,9 @@
 NO_REPEAT				 = no
+REP_ATTACK               = 500
+REP_INTERVAL             = 50
 VERBOSE					 = yes
 KEYBOARD_SHARED_EP       = yes
-STENO_LAYERS			 = no
+STENO_LAYERS			 = yes
 
 #Firmware reduction options
 MOUSEKEY_ENABLE			 = no 		# 1500 bytes
@@ -9,7 +11,7 @@ NO_TAPPING				 = no 	    # 2000 bytes
 NO_PRINT				 = yes		
 
 #Debug options
-CONSOLE_ENABLE			 = no
+CONSOLE_ENABLE			 = yes
 DEBUG_MATRIX_SCAN_RATE   = no
 DEBUG_MATRIX			 = no
 ONLY_QWERTY				 = no
@@ -23,6 +25,13 @@ ifeq ($(strip $(DEBUG_MATRIX)), yes)
 endif
 ifeq ($(strip $(NO_REPEAT)), yes)
     OPT_DEFS += -DNO_REPEAT
+else
+    ifdef REP_ATTACK
+        OPT_DEFS += -DREP_ATTACK=$(REP_ATTACK)
+    endif
+    ifdef REP_INTERVAL
+        OPT_DEFS += -DREP_INTERVAL=$(REP_INTERVAL)
+    endif
 endif
 ifeq ($(strip $(NO_PRINT)), yes)
     OPT_DEFS += -DNO_PRINT -DNO_DEBUG

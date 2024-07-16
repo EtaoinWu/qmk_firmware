@@ -25,6 +25,7 @@ void 			SEND(uint8_t kc);
 void 			SEND16(uint16_t kc);
 void 			REPEAT(void);
 void 			SET_STICKY(uint32_t);
+void 			REPORT_PREFIX(uint32_t);
 void 			SWITCH_LAYER(int);
 void 			CLICK_MOUSE(uint8_t);
 

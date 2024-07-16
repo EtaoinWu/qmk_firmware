@@ -53,6 +53,7 @@
 // http://docs.gboards.ca
 uint32_t processQwerty(bool lookup) {
     // Specials
+    REPORT_PREFIX(0);
     P( LSU | LFT | LP | LH | LNO
        | RNO | RF | RP | RL | RT,         SEND_STRING(VERSION); SEND_STRING(__DATE__));
     P( LNO | RNO | LA  | LO | RE | RU,    SEND(KC_MPLY));
@@ -64,29 +65,63 @@ uint32_t processQwerty(bool lookup) {
     // P( LO  | LR  | LW,    CLICK_MOUSE(KC_MS_BTN1));
 
     // Two-hand Thumb Specials
-    P( LA  | LO  | RE  | RU,    SEND(KC_CAPS));
-    P( LA  | RU,                SEND(KC_ENTER));
     // P( LNO | LA | RU | RNO,     ...);
     // P( LNO | LA | RE | RU,     ...);
+    //         ,---------------,    .---------------.
+    //         |     |    |    |    |    |    |     |
+    //         `---------------'    `---------------'
+
+    //    ,----*----*----,    .----*----*----.
+    //    |    | C A P S |    | L O C K |    |
+    //    `----*----*----'    `----*----*----'
+    P( LA  | LO  | RE  | RU,    SEND(KC_CAPS));
+
+    //    ,----*----*----,    .----*-----*----.
+    //    |    | EN |    |    |    | TER |    |
+    //    `----*----*----'    `----*-----*----'
+    P( LA  | RU,                SEND(KC_ENTER));
+    //    ,----*----*----,    .----*----*----.
+    //    | 囧 | 囧 |    |    | 囧 |    |    | = Ctrl-Alt-Shift
+    //    `----*----*----'    `----*----*----'
     P( LNO | LA  | RE,          SEND(KC_LCTL); SEND(KC_LSFT); SEND(KC_LALT));
 
     // One Thumb Specials & Mods
+    //    Ctrl+Alt
+    //  ,-----*-----*-----,
+    //  | Alt | SPC | Ctrl|
+    //  `-----*-----*-----'
+    //             Win
     P( LNO | LA,    SEND(KC_LCTL); SEND(KC_LALT));
     P( LA | LO,     SEND(KC_LGUI));
+    P( LNO,         SEND(KC_LALT));
+    P( LA,          SEND(KC_SPACE));
+    P( LO,          SEND(KC_LCTL));
+
+    //                         Backspace
+    //                       ,-----*-----*-----,
+    //                       |Shift| SPC | Bksp|
+    //                       `-----*-----*-----'
+    //                                  Tab
     P( RE | RU,     SEND(KC_BACKSPACE));
     P( RU | RNO,    SEND(KC_TAB));
-    P( LNO,         SEND(KC_LCTL));
-    P( LA,          SEND(KC_SPACE));
-    P( LO,          SEND(KC_LALT));
     P( RE,          SEND(KC_LSFT));
     P( RU,          SEND(KC_SPACE));
-    P( RNO,         SEND(KC_BACKSPACE));
+    P( RNO,         SEND(KC_BACKSPACE); ); // RNO is also the num layer
 
     // Right-hand Specials
-    P( RT | RD   | RS | RZ,    SEND(KC_LGUI));
+    //                                    Control
+    // ,-----------------.  ,---------------------.
+    // |  |  |  |  |  |  |  |  |  |  |  |    |Bcsp| E
+    // |--+--+--+--+--|--|  |--|--+--+--+---Win---| N
+    // |  |  |  |  |  |  |  |  |  |  |  |    | Esc| T
+    // `-----------------'  `---------------------'
+    //                                      Alt
+    P( RT | RD | RS | RZ,      SEND(KC_LGUI));
     P( RT | RD,                SEND(KC_LCTL));
     P( RS | RZ,                SEND(KC_LALT));
-    P( RD | RZ,                SEND(KC_ESC));
+    P( RD | RZ,                SEND(KC_ENTER));
+    P( RD,                     SEND(KC_BACKSPACE));
+    P( RZ,                     SEND(KC_ESC));
 
     // Function Layer
     // ,---------------------------------.    ,---------------------------------.
@@ -94,6 +129,7 @@ uint32_t processQwerty(bool lookup) {
     // |----+-----+-----+-----+-----|----|    |----|--F5-+--F6-+--F7-+--F8-+----|
     // |    | F U N C T |     |     |    |    |    | F9  | F10 | F11 | F12 |    |
     // `---------------------------------'    `---------------------------------'
+    REPORT_PREFIX(FUNCT);
     P( FUNCT | RF,         SEND(KC_F1));
     P( FUNCT | RP,         SEND(KC_F2));
     P( FUNCT | RL,         SEND(KC_F3));
@@ -113,6 +149,7 @@ uint32_t processQwerty(bool lookup) {
     // |----+----+----+----+----|----|    |-----|----+----+----+----+----|
     // |    |    |    |    |    |ment|    |     | ← | ↓ | → |PgDn|    |
     // `-----------------------------'    `------------------------------'
+    REPORT_PREFIX(MOVE);
     P( MOVE | RP,     SEND(KC_UP));
     P( MOVE | RB,     SEND(KC_DOWN));
     P( MOVE | RR,     SEND(KC_LEFT));
@@ -128,6 +165,7 @@ uint32_t processQwerty(bool lookup) {
     // |----+----+----+----+----|----|    |----|----+----+----+----+----|
     // |    |   MEDIA  PREFIX   |    |    |    |Prev| V- |Next|    |    |
     // `-----------------------------'    `-----------------------------'
+    REPORT_PREFIX(MEDIA);
     P( MEDIA | RP,    SEND(KC_AUDIO_VOL_UP));
     P( MEDIA | RB,    SEND(KC_AUDIO_VOL_DOWN));
     P( MEDIA | RR,    SEND(KC_MEDIA_PREV_TRACK));
@@ -136,6 +174,15 @@ uint32_t processQwerty(bool lookup) {
     P( MEDIA | RL,    SEND(KC_AUDIO_MUTE));
 
     // Number Row
+    // ,-----------------------.    ,-----------------------.
+    // |   | 1 | 2 | 3 | 4 | 5 |    | 6 | 7 | 8 | 9 | 0 |   |
+    // |---+---+---+---+---|---|    |---|---+---+---+---+---|
+    // |   |   |   |   |   |   |    |   |   |   |   |   |   |
+    // `-----------------------'    `-----------------------'
+    //             ,-----------,    .-----------.
+    //             |   |   |   |    |   |   |NUM|
+    //             `-----------'    `-----------'
+    REPORT_PREFIX(NUM);
     P( RNO | LSU,    SEND(KC_1));
     P( RNO | LFT,    SEND(KC_2));
     P( RNO | LP,     SEND(KC_3));
@@ -150,6 +197,15 @@ uint32_t processQwerty(bool lookup) {
     // P( RNO | LO,     SEND(KC_0));
 
     // Number Symbols (Shift + Number Row)
+    // ,-----------------------.    ,-----------------------.
+    // |   | ! | @ | # | $ | % |    | ^ | & | * | ( | ) |   |
+    // |---+---+---+---+---|---|    |---|---+---+---+---+---|
+    // |   |   |   |   |   |   |    |   |   |   |   |   |   |
+    // `-----------------------'    `-----------------------'
+    //             ,-----------,    .-----------.
+    //             |   |   |   |    |   |NUM-SYM|
+    //             `-----------'    `-----------'
+    REPORT_PREFIX(NUMSYM);
     P( NUMSYM | LSU,    SEND16(KC_EXCLAIM));     // !
     P( NUMSYM | LFT,    SEND16(KC_AT));          // @
     P( NUMSYM | LP,     SEND16(KC_HASH));        // #
@@ -163,6 +219,12 @@ uint32_t processQwerty(bool lookup) {
 
     // Symbols
     //  symbols row 1&2
+    // ,-----------------------.    ,-------------------------.
+    // |   | !   @   #   $   % |    | ^   &   *   (   )  Bksp |
+    // |---+                 | |    | ?   _   +   {   }  Enter|
+    // |SYM| ~   `   '   "   \ |    | /   -   =   [   ]  Esc  |
+    // `-----------------------'    `-------------------------'
+    REPORT_PREFIX(PWR);
     P( PWR | ST1 | ST2, SEND16(KC_PIPE));              // |
     P( PWR | ST3 | ST4, SEND16(KC_QUESTION));          // ?
     P( PWR | RF | RR,   SEND16(KC_UNDERSCORE));        // _
@@ -181,10 +243,10 @@ uint32_t processQwerty(bool lookup) {
     P( PWR | RL,        SEND16(KC_LEFT_PAREN));        // (
     P( PWR | RT,        SEND16(KC_RIGHT_PAREN));       // )
     //  symbols row 2
-    P( PWR | LSD,       SEND  (KC_GRAVE));             // `
-    P( PWR | LK,        SEND16(KC_TILDE));             // ~
-    P( PWR | LW,        SEND16(KC_COLON));             // :
-    P( PWR | LR,        SEND  (KC_SEMICOLON));         // ;
+    P( PWR | LSD,       SEND16(KC_TILDE));             // ~
+    P( PWR | LK,        SEND  (KC_GRAVE));             // `
+    P( PWR | LW,        SEND  (KC_QUOTE));             // '
+    P( PWR | LR,        SEND16(KC_DOUBLE_QUOTE));      // "
     P( PWR | ST2,       SEND  (KC_BACKSLASH));         // \ (backslash)
     P( PWR | ST4,       SEND  (KC_SLASH));             // /
     P( PWR | RR,        SEND  (KC_MINUS));             // -
@@ -192,20 +254,29 @@ uint32_t processQwerty(bool lookup) {
     P( PWR | RG,        SEND  (KC_LEFT_BRACKET));      // [
     P( PWR | RS,        SEND  (KC_RIGHT_BRACKET));     // ]
     //  symbols special
-    P( PWR | RD | RZ,   SEND16(KC_DOUBLE_QUOTE));      // "
-    P( PWR | RZ,        SEND  (KC_QUOTE));             // '
     P( PWR | RD,        SEND  (KC_BACKSPACE));
+    P( PWR | RD | RZ,   SEND  (KC_ENTER));
+    P( PWR | RZ,        SEND  (KC_ESC));
+    //     ,-----------------,    .-----------------.
+    //     | Tab | SPC | Del |    | Bksp| SPC |Enter|
+    //     `-----------------'    `-----------------'
     //  symbols special: left thumb
     P( PWR | LNO,       SEND  (KC_TAB));
-    P( PWR | LA,        SEND16(KC_SPACE));             // :
+    P( PWR | LA,        SEND16(KC_SPACE));
     P( PWR | LO,        SEND  (KC_DELETE));
     //  symbols special: right thumb
     P( PWR | RE,        SEND  (KC_BACKSPACE));
-    P( PWR | RU,        SEND  (KC_SPACE));             // ;
+    P( PWR | RU,        SEND  (KC_SPACE));
     P( PWR | RNO,       SEND  (KC_ENTER));
     P( PWR,             SEND  (KC_ESC));
 
     // Letters
+    // ,-----------------------.    ,-------------------------.
+    // |   | Q   W   E   R   T |    | Y   U   I   O   P  Bksp |
+    // |---+ A   S   D   F   G |    | H   J   K   L   ;  Enter|
+    // |   | Z   X   C   V   B |    | N   M   ,   .   /  Esc  |
+    // `-----------------------'    `-------------------------'
+    REPORT_PREFIX(0);
     P( LSU | LSD,    SEND(KC_A));
     P( LFT | LK,     SEND(KC_S));
     P( LP  | LW,     SEND(KC_D));
@@ -236,8 +307,6 @@ uint32_t processQwerty(bool lookup) {
     P( RG,           SEND(KC_DOT));
     P( RT,           SEND(KC_P));
     P( RS,           SEND(KC_SLASH));
-    P( RD,           SEND(KC_BACKSPACE));
-    P( RZ,           SEND(KC_ENTER));
 
     return 0;
 }
@@ -257,8 +326,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     // Combo layer to use with Rime
     [COMBO] = LAYOUT(
-        TO(STENO_LAYER), KC_Q,  KC_W,  KC_E,  KC_R,  KC_T,          KC_Y,  KC_U,  KC_I,    KC_O,  KC_P,    KC_BSPC,
-        KC_LCTL,         KC_A,  KC_S,  KC_D,  KC_F,  KC_G,          KC_H,  KC_J,  KC_K,    KC_L,  KC_SCLN, KC_ENT,
+        TO(STENO_LAYER), KC_Q,  KC_W,  KC_E,  KC_R,  KC_T,          KC_Y,  KC_U,  KC_I,    KC_O,  KC_P,    KC_BSLS,
+        KC_EQL,          KC_A,  KC_S,  KC_D,  KC_F,  KC_G,          KC_H,  KC_J,  KC_K,    KC_L,  KC_DOT,  KC_SLASH,
                                        KC_C,  KC_V,  KC_B,          KC_N,  KC_M,  KC_COMM
     ),
 };

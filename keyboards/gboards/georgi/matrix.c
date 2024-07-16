@@ -172,21 +172,21 @@ matrix_row_t debounce_read_cols(uint8_t row) {
 
 uint8_t matrix_scan(void)
 {
-  // Then the keyboard
-  if (mcp23018_status) { // if there was an error
-      if (++mcp23018_reset_loop == 0) {
-      // if (++mcp23018_reset_loop >= 1300) {
-          // since mcp23018_reset_loop is 8 bit - we'll try to reset once in 255 matrix scans
-          // this will be approx bit more frequent than once per second
-          print("trying to reset mcp23018\n");
-          mcp23018_status = init_mcp23018();
-          if (mcp23018_status) {
-              print("left side not responding\n");
-          } else {
-              print("left side attached\n");
-          }
-      }
-  }
+    // Then the keyboard
+    if (mcp23018_status) { // if there was an error
+        if (++mcp23018_reset_loop == 0) {
+        // if (++mcp23018_reset_loop >= 1300) {
+            // since mcp23018_reset_loop is 8 bit - we'll try to reset once in 255 matrix scans
+            // this will be approx bit more frequent than once per second
+            print("trying to reset mcp23018\n");
+            mcp23018_status = init_mcp23018();
+            if (mcp23018_status) {
+                print("left side not responding\n");
+            } else {
+                print("left side attached\n");
+            }
+        }
+    }
 
     for (uint8_t i = 0; i < MATRIX_ROWS_PER_SIDE; i++) {
         select_row(i);
@@ -297,10 +297,10 @@ static void select_row(uint8_t row)
     if (row < 7) {
         // select on mcp23018
         if (mcp23018_status) { // do nothing on error
+            return;
         } else { // set active row low  : 0 // set other rows hi-Z : 1
-        uint8_t data = 0xFF & ~(1<<row);
-        mcp23018_status = i2c_write_register(I2C_ADDR, GPIOA, &data, 1, ERGODOX_EZ_I2C_TIMEOUT);
-
+            uint8_t data = 0xFF & ~(1<<row);
+            mcp23018_status = i2c_write_register(I2C_ADDR, GPIOA, &data, 1, ERGODOX_EZ_I2C_TIMEOUT);
         }
     } else {
         // Output low(DDR:1, PORT:0) to select
